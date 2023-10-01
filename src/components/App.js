@@ -2,6 +2,8 @@ import React from "react";
 import Header from "./Header";
 import Inventory from "./Inventory";
 import Order from "./Order";
+import sampledishes from "../sample-dishes";
+import Dish from "./Dish";
 
 class App extends React.Component {
   state = {
@@ -20,17 +22,45 @@ class App extends React.Component {
     this.setState({
       dishes
     });
-    // console.log("here is your dish");
+     console.log(dishes);
   };
+
+  addToOrder = key=>{
+
+    const order = {...this.state.order};
+
+    order[key]= order[key] +1||1;
+
+    this.setState({
+      order
+    })
+
+
+  }
+    loadSampleDishes = () =>{ 
+      this.setState({
+        dishes:sampledishes
+      })
+    }
 
   render() {
     return (
       <div className="catch-of-the-day">
         <div className="menu">
-          <Header tag="North" />
+          <Header tag="& Best" />
+          <ul className="dishes">
+            {Object.keys(this.state.dishes).map(key => (
+              <Dish
+                key={key}
+                index={key}
+                details={this.state.dishes[key]}
+                addToOrder={this.addToOrder}
+              />
+            ))}
+          </ul>
         </div>
-        <Inventory addDish={this.addDish} />
-        <Order />
+        <Inventory addDish={this.addDish} loadDishes={this.loadSampleDishes} />
+        <Order dishes={this.state.dishes} order={this.state.order}/>
       </div>
     );
   }
