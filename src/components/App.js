@@ -14,8 +14,14 @@ class App extends React.Component {
  
   //For persisting data for inventory in firebase
   componentDidMount(){
+    const { params } = this.props.match;
     // firebase ref 
-    this.ref = base.syncState(`${this.props.match.params.storeId}/dishes`,{
+    const localStorageRef = localStorage.getItem(params.storeId);
+    if (localStorageRef) {
+      this.setState({ order: JSON.parse(localStorageRef) });
+    }
+    
+    this.ref = base.syncState(`${params.storeId}/dishes`,{
       context: this,
       state:'dishes'
        
@@ -44,6 +50,16 @@ class App extends React.Component {
     });
      console.log(dishes);
   };
+
+  updateDish = (key, updatedDish) => {
+    // 1. Take a copy of the current state
+    const dishes = { ...this.state.dishes };
+    // 2. Update that state
+    dishes[key] = updatedDish;
+    // 3. Set that to state
+    this.setState({ dishes });
+  };
+
 
   addToOrder = key=>{
 
@@ -79,7 +95,8 @@ class App extends React.Component {
             ))}
           </ul>
         </div>
-        <Inventory addDish={this.addDish} loadDishes={this.loadSampleDishes} />
+        <Inventory addDish={this.addDish} loadDishes={this.loadSampleDishes}           updateDish={this.updateDish}
+          dishes={this.state.dishes}/>
         <Order dishes={this.state.dishes} order={this.state.order}/>
       </div>
     );

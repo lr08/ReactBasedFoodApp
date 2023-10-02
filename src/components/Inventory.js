@@ -1,5 +1,6 @@
 import React from "react";
 import AddFoodForm from "./AddFoodForm";
+import EditDishForm from "./EditDishForm";
 
 class Inventory extends React.Component {
 
@@ -7,7 +8,15 @@ class Inventory extends React.Component {
     return (
       <div className="inventory">
         <h2>Inventory is here are you there</h2>
-        <AddFoodForm loadDishes={this.props.loadDishes} addDish={this.props.addDish} />
+        {Object.keys(this.props.dishes).map(key => (
+          <EditDishForm
+            key={key}
+            index={key}
+            dish={this.props.dishes[key]}
+            updateDish={this.props.updateDish}
+          />
+        ))}
+        <AddFoodForm addDish={this.props.addDish} />
         <button onClick={this.props.loadDishes}>Sample Dishes</button>
       </div>
     );
