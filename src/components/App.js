@@ -4,12 +4,32 @@ import Inventory from "./Inventory";
 import Order from "./Order";
 import sampledishes from "../sample-dishes";
 import Dish from "./Dish";
+import base from "../base";
 
 class App extends React.Component {
   state = {
     dishes: {},
     order: {},
   };
+ 
+  //For persisting data for inventory in firebase
+  componentDidMount(){
+    // firebase ref 
+    this.ref = base.syncState(`${this.props.match.params.storeId}/dishes`,{
+      context: this,
+      state:'dishes'
+       
+    });
+  }
+
+  componentWillUnmount(){
+    base.removeBinding(this.ref);
+  }
+
+  componentDidUpdate(){
+    // to store order
+    localStorage.setItem(this.props.match.params.storeId,JSON.stringify(this.state.order));
+  }
 
   addDish = dish => {
     // Steps to update a state

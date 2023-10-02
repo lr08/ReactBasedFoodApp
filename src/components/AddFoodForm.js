@@ -7,7 +7,7 @@ class AddFoodForm extends React.Component {
   descRef = React.createRef();
   imageRef = React.createRef();
 
-  createDish = event => {
+  createDish = (event) => {
     event.preventDefault();
     const dish = {
       name: this.nameRef.current.value,
