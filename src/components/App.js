@@ -11,44 +11,46 @@ class App extends React.Component {
     dishes: {},
     order: {},
   };
- 
+
   //For persisting data for inventory in firebase
-  componentDidMount(){
+  componentDidMount() {
     const { params } = this.props.match;
-    // firebase ref 
+    // firebase ref
     const localStorageRef = localStorage.getItem(params.storeId);
     if (localStorageRef) {
       this.setState({ order: JSON.parse(localStorageRef) });
     }
-    
-    this.ref = base.syncState(`${params.storeId}/dishes`,{
+
+    this.ref = base.syncState(`${params.storeId}/dishes`, {
       context: this,
-      state:'dishes'
-       
+      state: "dishes",
     });
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     base.removeBinding(this.ref);
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     // to store order
-    localStorage.setItem(this.props.match.params.storeId,JSON.stringify(this.state.order));
+    localStorage.setItem(
+      this.props.match.params.storeId,
+      JSON.stringify(this.state.order)
+    );
   }
 
-  addDish = dish => {
+  addDish = (dish) => {
     // Steps to update a state
     // 1. take copy of existing state
-    const dishes = {...this.state.dishes };
+    const dishes = { ...this.state.dishes };
 
     //2.add new dish to dishes variable
     dishes[`dish${Date.now()}`] = dish;
     // set the new dishes object to state
     this.setState({
-      dishes
+      dishes,
     });
-     console.log(dishes);
+    console.log(dishes);
   };
 
   updateDish = (key, updatedDish) => {
@@ -60,24 +62,39 @@ class App extends React.Component {
     this.setState({ dishes });
   };
 
+  addToOrder = (key) => {
+    const order = { ...this.state.order };
 
-  addToOrder = key=>{
-
-    const order = {...this.state.order};
-
-    order[key]= order[key] +1||1;
+    order[key] = order[key] + 1 || 1;
 
     this.setState({
-      order
-    })
+      order,
+    });
+  };
 
+  loadSampleDishes = () => {
+    this.setState({
+      dishes: sampledishes,
+    });
+  };
 
-  }
-    loadSampleDishes = () =>{ 
-      this.setState({
-        dishes:sampledishes
-      })
-    }
+  deleteDish = key => {
+    // 1. take a copy of state
+    const dishes = { ...this.state.dishes };
+    // 2. update the state
+    dishes[key] = null;
+    // 3.  update state
+    this.setState({ dishes });
+  };
+
+  removeFromOrder = key => {
+    // 1. take a copy of state
+    const order = { ...this.state.order };
+    // 2. remove that itemf from order
+    delete order[key];
+    // 3. Call setState to update our state object
+    this.setState({ order });
+  };
 
   render() {
     return (
@@ -85,7 +102,7 @@ class App extends React.Component {
         <div className="menu">
           <Header tag="& Best" />
           <ul className="dishes">
-            {Object.keys(this.state.dishes).map(key => (
+            {Object.keys(this.state.dishes).map((key) => (
               <Dish
                 key={key}
                 index={key}
@@ -95,9 +112,18 @@ class App extends React.Component {
             ))}
           </ul>
         </div>
-        <Inventory addDish={this.addDish} loadDishes={this.loadSampleDishes}           updateDish={this.updateDish}
-          dishes={this.state.dishes}/>
-        <Order dishes={this.state.dishes} order={this.state.order}/>
+        <Inventory
+          addDish={this.addDish}
+          loadDishes={this.loadSampleDishes}
+          updateDish={this.updateDish}
+          dishes={this.state.dishes}
+          deleteDish={this.deleteDish}
+        />
+        <Order
+          dishes={this.state.dishes}
+          order={this.state.order}
+          removeFromOrder={this.removeFromOrder}
+        />
       </div>
     );
   }
